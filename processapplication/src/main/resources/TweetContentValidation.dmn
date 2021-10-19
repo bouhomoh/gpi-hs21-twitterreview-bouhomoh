@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" id="TweetContentValidation" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.10.0">
+  <decision id="TweetContentCombinedDecision" name="Einzelprüfungen zusammenführen">
+    <informationRequirement id="InformationRequirement_1oopzjz">
+      <requiredDecision href="#TweetLengthCheck" />
+    </informationRequirement>
+    <informationRequirement id="InformationRequirement_02isvge">
+      <requiredDecision href="#ForbiddenWordsCheck" />
+    </informationRequirement>
+    <informationRequirement id="InformationRequirement_1ghit26">
+      <requiredDecision href="#PunctuationCheck" />
+    </informationRequirement>
+    <decisionTable id="DecisionTable_0c66mk3">
+      <input id="Input_1" label="Länge OK?">
+        <inputExpression id="InputExpression_1" typeRef="boolean">
+          <text>lengthOk</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_0kxz62c" label="Zeichensetzung OK? ">
+        <inputExpression id="LiteralExpression_019lbuv" typeRef="boolean">
+          <text>punctuationOk</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_0iuualv" label="Enthält verbotenes Wort?">
+        <inputExpression id="LiteralExpression_1fw1gza" typeRef="boolean">
+          <text>containsForbiddenWord</text>
+        </inputExpression>
+      </input>
+      <output id="Output_1" label="Prüfentscheid" name="result" typeRef="string" />
+      <output id="OutputClause_04m5k34" label="Begründung" name="comment" typeRef="string" />
+      <rule id="DecisionRule_02yxakz">
+        <inputEntry id="UnaryTests_092px6b">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1kxpk19">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0nag8u5">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1j7z84i">
+          <text>"manualCheckRequired"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1hhb5px">
+          <text></text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0cxsyxh">
+        <inputEntry id="UnaryTests_14lriy9">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_12hxrcl">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0fhv0xq">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0y2mucg">
+          <text>"rejected"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_1tafsz6">
+          <text>"Die Länge des Tweets ist nicht zwischen 20 und 280 Zeichen und es sind verbotene Wörter enthalten und die Zeichensetzung entspricht nicht den Vorgaben"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0apn6dr">
+        <inputEntry id="UnaryTests_0s9blfr">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_05djwpu">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_01ae0qh">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_14ffow5">
+          <text>"rejected"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0kei68v">
+          <text>"Die Länge des Tweets ist nicht zwischen 20 und 280 Zeichen und es sind verbotene Wörter enthalten"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1x7r521">
+        <inputEntry id="UnaryTests_09e36nj">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0gox6fe">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1bawion">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0x5tyh9">
+          <text>"rejected"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0hgvhd8">
+          <text>"Es sind verbotene Wörter enthalten und die Zeichensetzung entspricht nicht den Vorgaben"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0xt0yqp">
+        <inputEntry id="UnaryTests_1wxjejb">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0u4bvsh">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0yfqnop">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1ppqm09">
+          <text>"rejected"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_018j0xo">
+          <text>"Die Zeichensetzung entspricht nicht den Vorgaben"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1gzapnn">
+        <inputEntry id="UnaryTests_1qwehu0">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1pc3tfv">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1bnq4yx">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1tynwe7">
+          <text>"rejected"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_12gyzv7">
+          <text>"Die Länge des Tweets ist nicht zwischen 20 und 280 Zeichen"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_07sc3ff">
+        <inputEntry id="UnaryTests_18c2gmy">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1ah5jxt">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1yk9hdr">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1u1psa6">
+          <text>"rejected"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_0ry67o2">
+          <text>"Es sind verbotene Wörter enthalten"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0q7pn1v">
+        <inputEntry id="UnaryTests_18xk1ez">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1q99jcy">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1wsaoms">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1tgverp">
+          <text>"rejected"</text>
+        </outputEntry>
+        <outputEntry id="LiteralExpression_14iqc0v">
+          <text>"Die Länge des Tweets ist nicht zwischen 20 und 280 Zeichen und die Zeichensetzung entspricht nicht den Vorgaben"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <inputData id="InputData_0ewkatg" name="Tweet Content" />
+  <decision id="TweetLengthCheck" name="Auf erlaubter Länge prüfen">
+    <variable id="InformationItem_03l2byy" name="lengthOk" typeRef="boolean" />
+    <informationRequirement id="InformationRequirement_1cs210q">
+      <requiredInput href="#InputData_0ewkatg" />
+    </informationRequirement>
+    <literalExpression id="LiteralExpression_0iwgbmw" expressionLanguage="feel">
+      <text>string length(tweetContent) between 20 and 280
+</text>
+    </literalExpression>
+  </decision>
+  <decision id="PunctuationCheck" name="Auf korrekte Zeichensetzung prüfen">
+    <variable id="InformationItem_1gvu2h0" name="punctuationOk" typeRef="boolean" />
+    <informationRequirement id="InformationRequirement_05kcr9q">
+      <requiredInput href="#InputData_0ewkatg" />
+    </informationRequirement>
+    <literalExpression id="LiteralExpression_1lv0yd4" expressionLanguage="feel">
+      <text>matches(tweetContent, "^[A-Z][\S\s]*[?.!]$")</text>
+    </literalExpression>
+  </decision>
+  <decision id="ForbiddenWordsCheck" name="Auf verbotene Wörter prüfen">
+    <informationRequirement id="InformationRequirement_12bqxqd">
+      <requiredInput href="#InputData_0ewkatg" />
+    </informationRequirement>
+    <decisionTable id="DecisionTable_1qq4y2w" hitPolicy="FIRST">
+      <input id="InputClause_1fcwwf9" label="Tweet">
+        <inputExpression id="LiteralExpression_0735c1g" typeRef="string">
+          <text>lower case(tweetContent)</text>
+        </inputExpression>
+      </input>
+      <output id="OutputClause_0wpdykn" label="Enthält verbotenes Wort" name="containsForbiddenWord" typeRef="boolean" />
+      <rule id="DecisionRule_0mpzsb3">
+        <inputEntry id="UnaryTests_02b3sqs">
+          <text>contains(?,"buzzword")</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1xmuhzi">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1k9mbl0">
+        <inputEntry id="UnaryTests_0quf27o">
+          <text>contains(?,"digitalisierung")</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_10lyqx1">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0fbg6jg">
+        <inputEntry id="UnaryTests_0aeuz6d">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_01y23nx">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="TweetContentCombinedDecision">
+        <dc:Bounds height="80" width="180" x="400" y="100" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_08yjzfi" dmnElementRef="InformationRequirement_1oopzjz">
+        <di:waypoint x="250" y="320" />
+        <di:waypoint x="445" y="200" />
+        <di:waypoint x="445" y="180" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="DMNEdge_1oo8zl7" dmnElementRef="InformationRequirement_02isvge">
+        <di:waypoint x="490" y="320" />
+        <di:waypoint x="490" y="200" />
+        <di:waypoint x="490" y="180" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="DMNEdge_0s11vis" dmnElementRef="InformationRequirement_1ghit26">
+        <di:waypoint x="730" y="320" />
+        <di:waypoint x="535" y="200" />
+        <di:waypoint x="535" y="180" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNShape id="DMNShape_082umjg" dmnElementRef="InputData_0ewkatg">
+        <dc:Bounds height="45" width="125" x="427" y="447" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_1pdmg37" dmnElementRef="InformationRequirement_05kcr9q">
+        <di:waypoint x="490" y="447" />
+        <di:waypoint x="730" y="420" />
+        <di:waypoint x="730" y="400" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="DMNEdge_1jjolx5" dmnElementRef="InformationRequirement_12bqxqd">
+        <di:waypoint x="490" y="447" />
+        <di:waypoint x="490" y="420" />
+        <di:waypoint x="490" y="400" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNEdge id="DMNEdge_11caska" dmnElementRef="InformationRequirement_1cs210q">
+        <di:waypoint x="490" y="447" />
+        <di:waypoint x="250" y="420" />
+        <di:waypoint x="250" y="400" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNShape id="DMNShape_1dzpdm9" dmnElementRef="TweetLengthCheck">
+        <dc:Bounds height="80" width="180" x="160" y="320" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_0sxee59" dmnElementRef="PunctuationCheck">
+        <dc:Bounds height="80" width="180" x="640" y="320" />
+      </dmndi:DMNShape>
+      <dmndi:DMNShape id="DMNShape_0477r5g" dmnElementRef="ForbiddenWordsCheck">
+        <dc:Bounds height="80" width="180" x="400" y="320" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>
