@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0pbmdup" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.10.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.15.0">
+  <bpmn:process id="Process_0d58138" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" camunda:asyncAfter="true">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="firstName" label="Vorname" type="string" />
+          <camunda:formField id="userName" label="Benutzername" type="string" />
+          <camunda:formField id="homeorg" label="Heimorganisation" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_1ugbzuy</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_0qan7z1">
+      <bpmn:incoming>Flow_1lt27m8</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1lt27m8" sourceRef="Activity_0pu2v5n" targetRef="Event_0qan7z1" />
+    <bpmn:sequenceFlow id="Flow_1ugbzuy" sourceRef="StartEvent_1" targetRef="Activity_0pu2v5n" />
+    <bpmn:serviceTask id="Activity_0pu2v5n" name="Benutzer in AD erfassen" camunda:delegateExpression="${postUserAdapter}">
+      <bpmn:incoming>Flow_1ugbzuy</bpmn:incoming>
+      <bpmn:outgoing>Flow_1lt27m8</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_0d58138">
+      <bpmndi:BPMNEdge id="Flow_1lt27m8_di" bpmnElement="Flow_1lt27m8">
+        <di:waypoint x="350" y="117" />
+        <di:waypoint x="402" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ugbzuy_di" bpmnElement="Flow_1ugbzuy">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="250" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0qan7z1_di" bpmnElement="Event_0qan7z1">
+        <dc:Bounds x="402" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0nupnra_di" bpmnElement="Activity_0pu2v5n">
+        <dc:Bounds x="250" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

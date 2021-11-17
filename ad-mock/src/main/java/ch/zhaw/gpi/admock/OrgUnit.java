@@ -1,12 +1,17 @@
-package ch.zhaw.gpi.twitterreviewprocessapplication.ldap;
+package ch.zhaw.gpi.admock;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Entity
 public class OrgUnit {
     @Id
+    @JsonIgnore
     private String shortName;
+    @JsonProperty(value = "homeOrganization")
     private String longName;
 
     public String getShortName() {

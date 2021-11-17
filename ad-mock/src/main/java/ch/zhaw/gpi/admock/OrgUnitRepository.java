@@ -1,4 +1,4 @@
-package ch.zhaw.gpi.twitterreviewprocessapplication.ldap;
+package ch.zhaw.gpi.admock;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

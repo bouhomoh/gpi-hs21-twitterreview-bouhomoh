@@ -1,36 +1,52 @@
 package ch.zhaw.gpi.twitterreviewprocessapplication;
 
-import java.util.Optional;
-
 import javax.inject.Named;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
-import ch.zhaw.gpi.twitterreviewprocessapplication.ldap.User;
-import ch.zhaw.gpi.twitterreviewprocessapplication.ldap.UserRepository;
+import camundajar.impl.com.google.gson.JsonObject;
+import camundajar.impl.com.google.gson.JsonParser;
 
 @Named("getUserInformationAdapter")
 public class GetUserInformationDelegate implements JavaDelegate {
 
+    @Bean(name = "activeDirectoryRestclient")
+    public RestTemplate getActiveDirectoryRestClient(RestTemplateBuilder builder)
+    {
+        return builder.build();
+    }
+
     @Autowired
-    private UserRepository userRepository;
+    private RestTemplate activeDirectoryRestclient;
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
         String userName = (String) execution.getVariable("anfrageStellenderBenutzer");
         
-        String fullUserDescription;
-        String eMail;
+        String fullUserDescription = "";
+        String eMail = "";
 
-        Optional<User> user = userRepository.findById(userName);
-
-        if(user.isPresent()){
-            User existingUser = user.get();
-            eMail = existingUser.geteMail();
-            fullUserDescription = existingUser.getFirstName() + " " + existingUser.getOfficialName() + " (" + existingUser.getHomeOrganization().getLongName() + ")";
-        } else {
+        try
+        {
+        ResponseEntity<UserRepresentation> userResponse = activeDirectoryRestclient.exchange("http://localhost:8070/api/users/{username}", HttpMethod.GET, null, UserRepresentation.class, userName);
+            UserRepresentation user = userResponse.getBody();
+            eMail = user.geteMail();
+            
+            String homeOrgUri = user.get_links().getHomeOrganization().getHref();
+            ResponseEntity<String> homeOrgResponse = activeDirectoryRestclient.exchange(homeOrgUri, HttpMethod.GET, null, String.class);
+            JsonObject homeOrgResponseAsJson = new JsonParser().parse(homeOrgResponse.getBody()).getAsJsonObject();
+            String homeOrgLongName = homeOrgResponseAsJson.get("homeorg").getAsString();
+            fullUserDescription = user.getFirstName() + " " + user.getOfficialName() + " (" + homeOrgLongName + ")";
+        }
+        catch(Exception e)
+        {
             eMail = "alien@universe.os";
             fullUserDescription = "Alien (Universe)";    
         }
