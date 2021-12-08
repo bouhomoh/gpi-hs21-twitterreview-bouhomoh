@@ -108,6 +108,18 @@
       <version>1.10.1</version>
     </dependency>
 
+<dependency>
+ <groupId>com.twilio.sdk</groupId>
+ <artifactId>twilio</artifactId>
+ <version>8.22.1</version>
+ </dependency>
+ <dependency>
+ <groupId>com.sendgrid</groupId>
+ <artifactId>sendgrid-java</artifactId>
+ <version>4.8.0</version>
+ </dependency>
+
+
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-plugin-spin</artifactId>

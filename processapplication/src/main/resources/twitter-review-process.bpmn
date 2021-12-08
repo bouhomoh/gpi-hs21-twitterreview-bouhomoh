@@ -151,11 +151,13 @@
         <bpmn:flowNodeRef>TweetGepostedEndEvent</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gateway_0gxn63i</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>TweetAbgelehntEndEvent1</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>TweetSendenTask</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>BestatigungMitteilenTask</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>AblehnungMitteilenTask</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>TweetTextAutomatischPrufenTask</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>BenutzerinformationenAuslesenTask</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>TweetSendenTask</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_13kcx68</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_1iuo2h1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BestatigungMitteilenTask</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>AblehnungMitteilenTask</bpmn:flowNodeRef>
       </bpmn:lane>
       <bpmn:lane id="MitarbeiterLane" name="Mitarbeiter">
         <bpmn:flowNodeRef>TweetEingereichtStartEvent</bpmn:flowNodeRef>
@@ -190,18 +192,6 @@
     <bpmn:endEvent id="TweetAbgelehntEndEvent1" name="Tweet abgelehnt">
       <bpmn:incoming>Flow_0bpyw1q</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:task id="TweetSendenTask" name="Tweet senden">
-      <bpmn:incoming>GenehmigtSequenceFlow</bpmn:incoming>
-      <bpmn:outgoing>Flow_009rtmd</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:task id="BestatigungMitteilenTask" name="Bestätigung mitteilen">
-      <bpmn:incoming>Flow_009rtmd</bpmn:incoming>
-      <bpmn:outgoing>Flow_04dij6j</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:task id="AblehnungMitteilenTask" name="Ablehnung mitteilen">
-      <bpmn:incoming>AbgelehntSequenceFlow</bpmn:incoming>
-      <bpmn:outgoing>Flow_0bpyw1q</bpmn:outgoing>
-    </bpmn:task>
     <bpmn:startEvent id="TweetEingereichtStartEvent" name="Tweet eingereicht" camunda:asyncAfter="true" camunda:initiator="anfrageStellenderBenutzer">
       <bpmn:extensionElements>
         <camunda:formData>
@@ -286,7 +276,7 @@ execution.setProcessBusinessKey("T-" + anfrageStellenderBenutzer + "-" + tweetCo
     <bpmn:sequenceFlow id="Flow_0z4adnm" sourceRef="TweetTextAutomatischPrufenTask" targetRef="Gateway_0gxn63i" />
     <bpmn:sequenceFlow id="Flow_09kfwsd" sourceRef="TweetEingereichtStartEvent" targetRef="BenutzerinformationenAuslesenTask" />
     <bpmn:sequenceFlow id="Flow_0mddaue" sourceRef="Gateway_0vwhwno" targetRef="PrufergebnisGateway1" />
-    <bpmn:sequenceFlow id="AbgelehntSequenceFlow" name="Abgelehnt" sourceRef="PrufergebnisGateway1" targetRef="AblehnungMitteilenTask">
+    <bpmn:sequenceFlow id="AbgelehntSequenceFlow" name="Abgelehnt" sourceRef="PrufergebnisGateway1" targetRef="Gateway_13kcx68">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${checkResult=='rejected'}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="GenehmigtSequenceFlow" name="Genehmigt" sourceRef="PrufergebnisGateway1" targetRef="TweetSendenTask">
@@ -314,6 +304,35 @@ execution.setProcessBusinessKey("T-" + anfrageStellenderBenutzer + "-" + tweetCo
       <bpmn:incoming>Flow_09kfwsd</bpmn:incoming>
       <bpmn:outgoing>Flow_0pe345c</bpmn:outgoing>
     </bpmn:serviceTask>
+    <bpmn:serviceTask id="TweetSendenTask" name="Tweet senden" camunda:asyncAfter="true" camunda:type="external" camunda:topic="SendTweet">
+      <bpmn:incoming>GenehmigtSequenceFlow</bpmn:incoming>
+      <bpmn:outgoing>Flow_009rtmd</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_13kcx68">
+      <bpmn:incoming>AbgelehntSequenceFlow</bpmn:incoming>
+      <bpmn:incoming>Flow_1vvp02x</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ptlnen</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0ptlnen" sourceRef="Gateway_13kcx68" targetRef="AblehnungMitteilenTask" />
+    <bpmn:sequenceFlow id="Flow_1vvp02x" sourceRef="Event_1iuo2h1" targetRef="Gateway_13kcx68" />
+    <bpmn:boundaryEvent id="Event_1iuo2h1" name="Duplikat entdeckt" attachedToRef="TweetSendenTask">
+      <bpmn:extensionElements>
+        <camunda:executionListener event="end">
+          <camunda:script scriptFormat="JavaScript">execution.setVariable("checkResult", "rejected");
+execution.setVariable("checkResultComment", "Dieser Tweet wurde bereits auf Ihrem Twitter Account veröffentlicht.");</camunda:script>
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_1vvp02x</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_1yv1r4o" errorRef="Error_0cztbkf" />
+    </bpmn:boundaryEvent>
+    <bpmn:sendTask id="BestatigungMitteilenTask" name="Bestätigung mitteilen" camunda:delegateExpression="${sendNotificationAdapter}">
+      <bpmn:incoming>Flow_009rtmd</bpmn:incoming>
+      <bpmn:outgoing>Flow_04dij6j</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:sendTask id="AblehnungMitteilenTask" name="Ablehnung mitteilen" camunda:delegateExpression="${sendNotificationAdapter}">
+      <bpmn:incoming>Flow_0ptlnen</bpmn:incoming>
+      <bpmn:outgoing>Flow_0bpyw1q</bpmn:outgoing>
+    </bpmn:sendTask>
   </bpmn:process>
   <bpmn:error id="Error_0cztbkf" name="DuplicateError" errorCode="DuplicateTweet" />
   <bpmn:message id="Message_14lv5wi" name="MessageCancelTwitterReview" />
@@ -548,9 +567,9 @@ execution.setProcessBusinessKey("T-" + anfrageStellenderBenutzer + "-" + tweetCo
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_003w5uj_di" bpmnElement="AbgelehntSequenceFlow" bioc:stroke="#000" bioc:fill="#fff">
         <di:waypoint x="1065" y="1048" />
-        <di:waypoint x="1291" y="1048" />
+        <di:waypoint x="1165" y="1048" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1068" y="1030" width="50" height="14" />
+          <dc:Bounds x="1062" y="1030" width="50" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0mddaue_di" bpmnElement="Flow_0mddaue">
@@ -593,6 +612,14 @@ execution.setProcessBusinessKey("T-" + anfrageStellenderBenutzer + "-" + tweetCo
         <di:waypoint x="650" y="840" />
         <di:waypoint x="650" y="1023" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ptlnen_di" bpmnElement="Flow_0ptlnen">
+        <di:waypoint x="1215" y="1048" />
+        <di:waypoint x="1291" y="1048" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1vvp02x_di" bpmnElement="Flow_1vvp02x">
+        <di:waypoint x="1190" y="1106" />
+        <di:waypoint x="1190" y="1073" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Gateway_1wjj6dm_di" bpmnElement="ManuellePrufungErforderlichGateway" isMarkerVisible="true" bioc:stroke="#000" bioc:fill="#fff">
         <dc:Bounds x="708" y="1023" width="50" height="50" />
         <bpmndi:BPMNLabel>
@@ -623,15 +650,6 @@ execution.setProcessBusinessKey("T-" + anfrageStellenderBenutzer + "-" + tweetCo
           <dc:Bounds x="1429" y="1073" width="82" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0qtbo24_di" bpmnElement="TweetSendenTask">
-        <dc:Bounds x="1144" y="1124" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1q3p9sy_di" bpmnElement="BestatigungMitteilenTask">
-        <dc:Bounds x="1291" y="1124" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0t327jc_di" bpmnElement="AblehnungMitteilenTask">
-        <dc:Bounds x="1291" y="1008" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_14lhz0a_di" bpmnElement="TweetEingereichtStartEvent" bioc:stroke="#000" bioc:fill="#fff">
         <dc:Bounds x="216" y="875" width="36" height="36" />
         <bpmndi:BPMNLabel>
@@ -644,8 +662,17 @@ execution.setProcessBusinessKey("T-" + anfrageStellenderBenutzer + "-" + tweetCo
       <bpmndi:BPMNShape id="Activity_1vu3sy6_di" bpmnElement="TweetUberarbeitenTask1">
         <dc:Bounds x="1144" y="863" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1i70f2j_di" bpmnElement="BenutzerinformationenAuslesenTask">
-        <dc:Bounds x="323" y="1008" width="100" height="80" />
+      <bpmndi:BPMNShape id="Activity_1no3atu_di" bpmnElement="TweetSendenTask">
+        <dc:Bounds x="1144" y="1124" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_13kcx68_di" bpmnElement="Gateway_13kcx68" isMarkerVisible="true">
+        <dc:Bounds x="1165" y="1023" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0bxhzs3_di" bpmnElement="BestatigungMitteilenTask">
+        <dc:Bounds x="1291" y="1124" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0bex8h5_di" bpmnElement="AblehnungMitteilenTask">
+        <dc:Bounds x="1291" y="1008" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1we8d2j_di" bpmnElement="Activity_1nhuc2o" isExpanded="true">
         <dc:Bounds x="310" y="770" width="315" height="163" />
@@ -675,6 +702,15 @@ execution.setProcessBusinessKey("T-" + anfrageStellenderBenutzer + "-" + tweetCo
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_10ezxb5_di" bpmnElement="TweetTextAutomatischPrufenTask">
         <dc:Bounds x="480" y="1008" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1i70f2j_di" bpmnElement="BenutzerinformationenAuslesenTask">
+        <dc:Bounds x="323" y="1008" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0x2dk17_di" bpmnElement="Event_1iuo2h1">
+        <dc:Bounds x="1172" y="1106" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1208" y="1103" width="86" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Participant_1odtvf4_di" bpmnElement="MicrosoftActiveDirectoryParticipant" isHorizontal="true">
         <dc:Bounds x="120" y="1410" width="300" height="60" />

@@ -32,12 +32,16 @@ public class GetUserInformationDelegate implements JavaDelegate {
         
         String fullUserDescription = "";
         String eMail = "";
+        String phoneNumber = "";
+        String notificationChannel = "";
 
         try
         {
         ResponseEntity<UserRepresentation> userResponse = activeDirectoryRestclient.exchange("http://localhost:8070/api/users/{username}", HttpMethod.GET, null, UserRepresentation.class, userName);
             UserRepresentation user = userResponse.getBody();
             eMail = user.geteMail();
+            phoneNumber = user.getPhoneNumber();
+            notificationChannel = user.getNotificationChannel();
             
             String homeOrgUri = user.get_links().getHomeOrganization().getHref();
             ResponseEntity<String> homeOrgResponse = activeDirectoryRestclient.exchange(homeOrgUri, HttpMethod.GET, null, String.class);
@@ -53,6 +57,8 @@ public class GetUserInformationDelegate implements JavaDelegate {
 
         execution.setVariable("userMail", eMail);
         execution.setVariable("userFullDescription", fullUserDescription);
+        execution.setVariable("userPhoneNumber", phoneNumber);
+        execution.setVariable("userNotificationChannel", notificationChannel);
     }
     
 }

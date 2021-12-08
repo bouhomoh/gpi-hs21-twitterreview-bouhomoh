@@ -35,3 +35,5 @@
 ### Credentials & Co. ####
 mail.properties
 mail-template.properties
+processapplication/src/main/resources/data.sql
+ad-mock/src/main/resources/data.sql
